@@ -483,28 +483,52 @@ class GameScene extends Phaser.Scene {
     }
 
     collectNearbyXPGems() {
-        // XP gems stay on the ground - player must walk over them to collect
-        // No attraction/following behavior - just instant pickup within range
+        // XP gems stay on the ground until player gets close
+        // When in pickup range, they fly smoothly towards player
+        // Collect when they actually reach the player
         const pickupRadius = CONSTANTS.PLAYER_PICKUP_RADIUS * (1 + this.player.pickupRangeBonus);
+        const collectRadius = 15; // Actually collect when this close
         
         this.xpGems.getChildren().forEach(gemSprite => {
-            // Make sure gem is stationary (no velocity)
-            if (gemSprite.body) {
-                gemSprite.body.setVelocity(0, 0);
-            }
-            
             const distance = Phaser.Math.Distance.Between(
                 this.player.sprite.x, this.player.sprite.y,
                 gemSprite.x, gemSprite.y
             );
             
-            // Instant pickup if within range
-            if (distance < pickupRadius) {
+            // Check if gem is being attracted (flying towards player)
+            const isAttracting = gemSprite.getData('attracting');
+            
+            if (distance < collectRadius) {
+                // Close enough - collect the gem
                 const gem = gemSprite.getData('instance');
                 if (gem) {
                     this.player.addXP(gem.value);
                     gem.collect();
                 }
+            } else if (distance < pickupRadius || isAttracting) {
+                // Within pickup range - start flying towards player
+                gemSprite.setData('attracting', true);
+                
+                const angle = Phaser.Math.Angle.Between(
+                    gemSprite.x, gemSprite.y,
+                    this.player.sprite.x, this.player.sprite.y
+                );
+                
+                // Speed increases as gem gets closer for smooth acceleration
+                const speed = 250 + (1 - distance / pickupRadius) * 150;
+                
+                if (gemSprite.body) {
+                    gemSprite.body.setVelocity(
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed
+                    );
+                }
+            } else {
+                // Not in range - stay still
+                if (gemSprite.body) {
+                    gemSprite.body.setVelocity(0, 0);
+                }
+                gemSprite.setData('attracting', false);
             }
         });
     }
