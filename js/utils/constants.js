@@ -64,6 +64,30 @@ const CONSTANTS = {
             xp: 5,
             color: 0xF5F5DC
         },
+        ghost: {
+            name: 'Ghost',
+            hp: 12,
+            damage: 12,
+            speed: 120,
+            xp: 4,
+            color: 0x88CCFF
+        },
+        mummy: {
+            name: 'Mummy',
+            hp: 60,
+            damage: 15,
+            speed: 30,
+            xp: 8,
+            color: 0xD4A574
+        },
+        werewolf: {
+            name: 'Werewolf',
+            hp: 40,
+            damage: 20,
+            speed: 90,
+            xp: 12,
+            color: 0x5C4033
+        },
         death: {
             name: 'Death',
             hp: 999999,

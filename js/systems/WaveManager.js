@@ -3,11 +3,14 @@ class WaveManager {
         this.scene = scene;
         this.lastSpawnTime = 0;
         this.spawnRate = CONSTANTS.ENEMY_SPAWN_RATE_BASE;
-        this.enemyTypes = ['bat', 'zombie', 'skeleton'];
+        this.enemyTypes = ['bat', 'zombie', 'skeleton', 'ghost', 'mummy', 'werewolf'];
         this.spawnWeights = {
             bat: 80,
             zombie: 15,
-            skeleton: 5
+            skeleton: 5,
+            ghost: 0,
+            mummy: 0,
+            werewolf: 0
         };
 
         // Hoard system
@@ -89,22 +92,25 @@ class WaveManager {
         if (time - this.lastSpawnTime >= this.spawnRate) {
             this.lastSpawnTime = time;
             
-            // Spawn count - gradual increase
-            // Early game (level 1-4): 1-2 enemies per spawn
-            // Mid game (level 5-10): 2-4 enemies per spawn
-            // Late game (level 10+): 3-6 enemies per spawn
+            // Spawn count - scales with both level and time
+            // Early game (level 1-4): 1-3 enemies per spawn
+            // Mid game (level 5-10): 2-5 enemies per spawn
+            // Late game (level 10-15): 4-8 enemies per spawn
+            // End game (level 15+): 5-10 enemies per spawn
             let spawnCount = 1;
             
             if (playerLevel <= 4) {
-                spawnCount = 1 + Math.floor(gameProgress * 2); // 1-2
+                spawnCount = 1 + Math.floor(gameProgress * 2); // 1-3
             } else if (playerLevel <= 10) {
-                spawnCount = 2 + Math.floor(gameProgress * 3); // 2-4
+                spawnCount = 2 + Math.floor(gameProgress * 3); // 2-5
+            } else if (playerLevel <= 15) {
+                spawnCount = 4 + Math.floor(gameProgress * 4); // 4-8
             } else {
-                spawnCount = 3 + Math.floor(gameProgress * 4); // 3-6
+                spawnCount = 5 + Math.floor(gameProgress * 5); // 5-10
             }
             
-            // Time also increases spawn count
-            spawnCount += Math.floor(gameProgress * 3);
+            // Time also increases spawn count (more pressure over time)
+            spawnCount += Math.floor(gameProgress * 4);
             
             // During hoard, multiply spawn count
             if (this.hoardActive) {
@@ -127,27 +133,27 @@ class WaveManager {
     }
 
     updateSpawnWeights(gameProgress) {
-        // Enemy mix based on TIME only (not player level)
-        // This makes progression predictable
+        // Enemy mix based on TIME - new enemies introduced progressively
+        // Ghost appears at ~10 min, Mummy at ~15 min, Werewolf at ~20 min
         
         if (gameProgress < 0.15) {
             // First 4.5 minutes - very easy, mostly bats
-            this.spawnWeights = { bat: 90, zombie: 8, skeleton: 2 };
-        } else if (gameProgress < 0.3) {
-            // 4.5-9 minutes - introduce more zombies
-            this.spawnWeights = { bat: 70, zombie: 25, skeleton: 5 };
+            this.spawnWeights = { bat: 90, zombie: 8, skeleton: 2, ghost: 0, mummy: 0, werewolf: 0 };
+        } else if (gameProgress < 0.33) {
+            // 4.5-10 minutes - introduce more zombies and skeletons
+            this.spawnWeights = { bat: 65, zombie: 25, skeleton: 10, ghost: 0, mummy: 0, werewolf: 0 };
         } else if (gameProgress < 0.5) {
-            // 9-15 minutes - balanced mix
-            this.spawnWeights = { bat: 55, zombie: 30, skeleton: 15 };
-        } else if (gameProgress < 0.7) {
-            // 15-21 minutes - more dangerous
-            this.spawnWeights = { bat: 40, zombie: 35, skeleton: 25 };
-        } else if (gameProgress < 0.85) {
-            // 21-25.5 minutes - getting tough
-            this.spawnWeights = { bat: 30, zombie: 35, skeleton: 35 };
+            // 10-15 minutes - GHOSTS appear! Fast and spooky
+            this.spawnWeights = { bat: 45, zombie: 25, skeleton: 15, ghost: 15, mummy: 0, werewolf: 0 };
+        } else if (gameProgress < 0.67) {
+            // 15-20 minutes - MUMMIES appear! Tanky threats
+            this.spawnWeights = { bat: 30, zombie: 25, skeleton: 15, ghost: 15, mummy: 15, werewolf: 0 };
+        } else if (gameProgress < 0.83) {
+            // 20-25 minutes - WEREWOLVES appear! Deadly hunters
+            this.spawnWeights = { bat: 20, zombie: 20, skeleton: 15, ghost: 15, mummy: 15, werewolf: 15 };
         } else {
-            // 25.5-30 minutes - hardest mix before Death
-            this.spawnWeights = { bat: 20, zombie: 40, skeleton: 40 };
+            // 25-30 minutes - hardest mix before Death, heavy on dangerous enemies
+            this.spawnWeights = { bat: 10, zombie: 15, skeleton: 15, ghost: 20, mummy: 20, werewolf: 20 };
         }
     }
 
@@ -186,20 +192,34 @@ class WaveManager {
         // Get enemy type based on weights
         const enemyType = this.getRandomEnemyType();
 
-        // Very mild level scaling - only after level 5
-        // Level 1-4: no scaling
-        // Level 5+: 5% stronger per level above 4
+        // Enemy scaling to keep up with player upgrades
+        // Level 1-4: no scaling (early game is chill)
+        // Level 5-10: 8% stronger per level (moderate scaling)
+        // Level 10-15: 10% stronger per level (challenging)
+        // Level 15+: 12% stronger per level (late game threat)
         const playerLevel = player.level;
+        const gameProgress = this.scene.gameTime / CONSTANTS.GAME_DURATION;
+        
         let levelScaling = 1;
-        if (playerLevel > 4) {
-            levelScaling = 1 + (playerLevel - 4) * 0.05;
+        if (playerLevel > 4 && playerLevel <= 10) {
+            levelScaling = 1 + (playerLevel - 4) * 0.08;
+        } else if (playerLevel > 10 && playerLevel <= 15) {
+            levelScaling = 1.48 + (playerLevel - 10) * 0.10;
+        } else if (playerLevel > 15) {
+            levelScaling = 1.98 + (playerLevel - 15) * 0.12;
         }
+        
+        // Time-based scaling (enemies get 50% stronger over 30 minutes)
+        const timeScaling = 1 + (gameProgress * 0.5);
+        
+        // Combined scaling
+        const totalScaling = levelScaling * timeScaling;
 
         // Create enemy with scaled stats
         const enemy = new Enemy(this.scene, x, y, enemyType);
-        enemy.hp *= levelScaling;
-        enemy.maxHp *= levelScaling;
-        enemy.damage *= levelScaling;
+        enemy.hp *= totalScaling;
+        enemy.maxHp *= totalScaling;
+        enemy.damage *= totalScaling;
     }
 
     despawnDistantEnemies() {

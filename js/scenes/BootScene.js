@@ -40,6 +40,9 @@ class BootScene extends Phaser.Scene {
         this.createBatSprite();
         this.createZombieSprite();
         this.createSkeletonSprite();
+        this.createGhostSprite();
+        this.createMummySprite();
+        this.createWerewolfSprite();
         this.createDeathSprite();
 
         // XP Gems
@@ -373,6 +376,161 @@ class BootScene extends Phaser.Scene {
         g.fillRect(15, 9, 1, 2);
         
         g.generateTexture('enemy_skeleton', size, size);
+        g.destroy();
+    }
+
+    createGhostSprite() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        const size = 26;
+        
+        // Ghost body (transparent ethereal shape)
+        g.fillStyle(0x88CCFF, 0.6);
+        g.fillEllipse(13, 10, 10, 8);
+        
+        // Body flowing down
+        g.fillStyle(0x88CCFF, 0.5);
+        g.fillRect(6, 10, 14, 10);
+        
+        // Wavy bottom (ghostly trail)
+        g.fillTriangle(6, 20, 9, 24, 9, 20);
+        g.fillTriangle(11, 20, 13, 26, 15, 20);
+        g.fillTriangle(17, 20, 20, 24, 20, 20);
+        
+        // Inner glow
+        g.fillStyle(0xCCEEFF, 0.7);
+        g.fillEllipse(13, 10, 6, 5);
+        
+        // Eyes (hollow dark)
+        g.fillStyle(0x000033, 1);
+        g.fillEllipse(10, 9, 2, 3);
+        g.fillEllipse(16, 9, 2, 3);
+        
+        // Mouth (spooky O shape)
+        g.fillEllipse(13, 14, 2, 2);
+        
+        g.generateTexture('enemy_ghost', size, size);
+        g.destroy();
+    }
+
+    createMummySprite() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        const size = 30;
+        
+        // Shadow
+        g.fillStyle(0x000000, 0.3);
+        g.fillEllipse(15, 28, 12, 4);
+        
+        // Body (wrapped in bandages)
+        g.fillStyle(0xD4A574, 1);
+        g.fillRect(10, 10, 10, 14);
+        
+        // Bandage stripes
+        g.fillStyle(0xE8D4B8, 1);
+        g.fillRect(10, 12, 10, 2);
+        g.fillRect(10, 16, 10, 2);
+        g.fillRect(10, 20, 10, 2);
+        
+        // Legs
+        g.fillStyle(0xD4A574, 1);
+        g.fillRect(10, 24, 4, 5);
+        g.fillRect(16, 24, 4, 5);
+        
+        // Leg bandages
+        g.fillStyle(0xE8D4B8, 1);
+        g.fillRect(10, 25, 4, 1);
+        g.fillRect(16, 26, 4, 1);
+        
+        // Arms (reaching out)
+        g.fillStyle(0xD4A574, 1);
+        g.fillRect(5, 12, 5, 4);
+        g.fillRect(20, 12, 5, 4);
+        
+        // Head
+        g.fillStyle(0xD4A574, 1);
+        g.fillRect(10, 3, 10, 8);
+        
+        // Head bandages
+        g.fillStyle(0xE8D4B8, 1);
+        g.fillRect(10, 4, 10, 2);
+        g.fillRect(10, 8, 10, 2);
+        
+        // Eyes (glowing through bandages)
+        g.fillStyle(0xFFCC00, 1);
+        g.fillRect(12, 6, 2, 2);
+        g.fillRect(16, 6, 2, 2);
+        
+        g.generateTexture('enemy_mummy', size, size);
+        g.destroy();
+    }
+
+    createWerewolfSprite() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        const size = 32;
+        
+        // Shadow
+        g.fillStyle(0x000000, 0.3);
+        g.fillEllipse(16, 30, 14, 5);
+        
+        // Body (muscular, hunched)
+        g.fillStyle(0x5C4033, 1);
+        g.fillRect(10, 14, 12, 10);
+        
+        // Fur texture
+        g.fillStyle(0x3D2817, 1);
+        g.fillRect(11, 15, 2, 3);
+        g.fillRect(15, 17, 2, 3);
+        g.fillRect(19, 15, 2, 3);
+        
+        // Legs (powerful)
+        g.fillStyle(0x5C4033, 1);
+        g.fillRect(10, 24, 4, 6);
+        g.fillRect(18, 24, 4, 6);
+        
+        // Clawed feet
+        g.fillStyle(0x2D1F0F, 1);
+        g.fillRect(9, 29, 2, 2);
+        g.fillRect(13, 29, 2, 2);
+        g.fillRect(17, 29, 2, 2);
+        g.fillRect(21, 29, 2, 2);
+        
+        // Arms (with claws)
+        g.fillStyle(0x5C4033, 1);
+        g.fillRect(5, 15, 5, 5);
+        g.fillRect(22, 15, 5, 5);
+        
+        // Claws
+        g.fillStyle(0x2D1F0F, 1);
+        g.fillRect(3, 18, 3, 2);
+        g.fillRect(26, 18, 3, 2);
+        
+        // Head (wolf-like)
+        g.fillStyle(0x5C4033, 1);
+        g.fillRect(10, 4, 12, 10);
+        
+        // Snout
+        g.fillStyle(0x4A3527, 1);
+        g.fillRect(14, 10, 6, 4);
+        
+        // Nose
+        g.fillStyle(0x1a1a1a, 1);
+        g.fillRect(16, 11, 2, 2);
+        
+        // Ears (pointed)
+        g.fillStyle(0x5C4033, 1);
+        g.fillTriangle(10, 4, 12, 0, 14, 4);
+        g.fillTriangle(18, 4, 20, 0, 22, 4);
+        
+        // Eyes (fierce yellow)
+        g.fillStyle(0xFFDD00, 1);
+        g.fillRect(12, 7, 3, 2);
+        g.fillRect(17, 7, 3, 2);
+        
+        // Pupils
+        g.fillStyle(0x000000, 1);
+        g.fillRect(13, 7, 1, 2);
+        g.fillRect(18, 7, 1, 2);
+        
+        g.generateTexture('enemy_werewolf', size, size);
         g.destroy();
     }
 
