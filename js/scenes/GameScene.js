@@ -247,56 +247,57 @@ class GameScene extends Phaser.Scene {
         this.hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(100);
 
         // Padding for safe areas on notched devices (iPhone X, 11, 12, 13, 14, 15, etc.)
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const isIPhone = /iPhone/i.test(navigator.userAgent);
         
-        // Extra padding for notched iPhones in landscape
-        const topPad = isIPhone ? 15 : 10;
-        const sidePad = isIPhone ? 55 : 20;  // Dynamic Island + notch area
-        const bottomPad = isIPhone ? 25 : 15; // Home indicator area
+        // For 16:9 aspect ratio, we use percentage-based padding
+        // iPhone Dynamic Island in landscape takes about 6% of screen width on each side
+        const topPad = 12;
+        const sidePad = isIPhone ? Math.floor(CONSTANTS.GAME_WIDTH * 0.06) : 15; // ~58px on 960
+        const bottomPad = 18;
 
         // Timer display (top center)
         this.timerText = this.add.text(CONSTANTS.GAME_WIDTH / 2, topPad, '30:00', {
-            font: 'bold 28px monospace',
+            font: 'bold 26px monospace',
             fill: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 4
+            strokeThickness: 3
         }).setOrigin(0.5, 0);
         this.hudContainer.add(this.timerText);
 
         // HP Bar (top left - with safe area padding)
-        const hpBarBg = this.add.rectangle(sidePad, topPad, 180, 18, 0x440000).setOrigin(0, 0);
-        this.hpBar = this.add.rectangle(sidePad, topPad, 180, 18, 0xff4444).setOrigin(0, 0);
-        this.hpText = this.add.text(sidePad + 90, topPad + 9, '100/100', {
-            font: '11px monospace',
+        const hpBarBg = this.add.rectangle(sidePad, topPad, 160, 16, 0x440000).setOrigin(0, 0);
+        this.hpBar = this.add.rectangle(sidePad, topPad, 160, 16, 0xff4444).setOrigin(0, 0);
+        this.hpText = this.add.text(sidePad + 80, topPad + 8, '100/100', {
+            font: '10px monospace',
             fill: '#ffffff'
         }).setOrigin(0.5);
         this.hudContainer.add([hpBarBg, this.hpBar, this.hpText]);
 
         // Level display (top left, below HP)
-        this.levelText = this.add.text(sidePad, topPad + 24, 'Level: 1', {
-            font: '14px monospace',
+        this.levelText = this.add.text(sidePad, topPad + 20, 'Level: 1', {
+            font: '12px monospace',
             fill: '#00ff88'
         });
         this.hudContainer.add(this.levelText);
 
         // XP Bar (bottom - with safe area padding)
+        const xpBarWidth = CONSTANTS.GAME_WIDTH - (sidePad * 2);
         const xpBarBg = this.add.rectangle(CONSTANTS.GAME_WIDTH / 2, CONSTANTS.GAME_HEIGHT - bottomPad, 
-            CONSTANTS.GAME_WIDTH - (sidePad * 2) - 20, 14, 0x003322).setOrigin(0.5);
-        this.xpBar = this.add.rectangle(sidePad + 10, CONSTANTS.GAME_HEIGHT - bottomPad - 7, 0, 14, 0x00ff88).setOrigin(0, 0);
-        this.xpBarWidth = CONSTANTS.GAME_WIDTH - (sidePad * 2) - 20; // Store for updates
+            xpBarWidth, 12, 0x003322).setOrigin(0.5);
+        this.xpBar = this.add.rectangle(sidePad, CONSTANTS.GAME_HEIGHT - bottomPad - 6, 0, 12, 0x00ff88).setOrigin(0, 0);
+        this.xpBarWidth = xpBarWidth; // Store for updates
         this.hudContainer.add([xpBarBg, this.xpBar]);
 
         // Kill count (top right - with safe area padding)
         this.killText = this.add.text(CONSTANTS.GAME_WIDTH - sidePad, topPad, 'Kills: 0', {
-            font: '14px monospace',
+            font: '12px monospace',
             fill: '#ff6666'
         }).setOrigin(1, 0);
         this.hudContainer.add(this.killText);
 
         // Weapon display (top right, below kills)
-        this.weaponText = this.add.text(CONSTANTS.GAME_WIDTH - sidePad, topPad + 20, '', {
-            font: '11px monospace',
+        this.weaponText = this.add.text(CONSTANTS.GAME_WIDTH - sidePad, topPad + 16, '', {
+            font: '10px monospace',
             fill: '#9966ff'
         }).setOrigin(1, 0);
         this.hudContainer.add(this.weaponText);

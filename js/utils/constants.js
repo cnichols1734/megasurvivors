@@ -1,8 +1,8 @@
 // Game Constants - Easily tweakable for balancing
 const CONSTANTS = {
-    // Game Settings
-    GAME_WIDTH: 800,
-    GAME_HEIGHT: 600,
+    // Game Settings - 16:9 aspect ratio for mobile compatibility
+    GAME_WIDTH: 960,
+    GAME_HEIGHT: 540,
     WORLD_WIDTH: 2400,
     WORLD_HEIGHT: 2400,
     GAME_DURATION: 30 * 60 * 1000, // 30 minutes in ms

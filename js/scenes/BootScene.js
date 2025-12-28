@@ -425,13 +425,13 @@ class BootScene extends Phaser.Scene {
     }
 
     createUITextures() {
-        // Upgrade card background
+        // Upgrade card background - sized for 16:9 aspect ratio
         const cardGraphics = this.make.graphics({ x: 0, y: 0, add: false });
         cardGraphics.fillStyle(0x2a1a4a, 1);
-        cardGraphics.fillRoundedRect(0, 0, 180, 220, 12);
-        cardGraphics.lineStyle(3, 0x8a2be2, 1);
-        cardGraphics.strokeRoundedRect(0, 0, 180, 220, 12);
-        cardGraphics.generateTexture('upgrade_card', 180, 220);
+        cardGraphics.fillRoundedRect(0, 0, 160, 180, 10);
+        cardGraphics.lineStyle(2, 0x8a2be2, 1);
+        cardGraphics.strokeRoundedRect(0, 0, 160, 180, 10);
+        cardGraphics.generateTexture('upgrade_card', 160, 180);
         cardGraphics.destroy();
 
         // Weapon icons
