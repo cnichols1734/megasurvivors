@@ -246,50 +246,63 @@ class GameScene extends Phaser.Scene {
         // Create fixed HUD layer
         this.hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(100);
 
+        // Padding for safe areas on notched devices (iPhone X, 11, 12, 13, 14, 15, etc.)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIPhone = /iPhone/i.test(navigator.userAgent);
+        
+        // Extra padding for notched iPhones in landscape
+        const topPad = isIPhone ? 15 : 10;
+        const sidePad = isIPhone ? 55 : 20;  // Dynamic Island + notch area
+        const bottomPad = isIPhone ? 25 : 15; // Home indicator area
+
         // Timer display (top center)
-        this.timerText = this.add.text(CONSTANTS.GAME_WIDTH / 2, 20, '30:00', {
-            font: 'bold 32px monospace',
+        this.timerText = this.add.text(CONSTANTS.GAME_WIDTH / 2, topPad, '30:00', {
+            font: 'bold 28px monospace',
             fill: '#ffffff',
             stroke: '#000000',
             strokeThickness: 4
         }).setOrigin(0.5, 0);
         this.hudContainer.add(this.timerText);
 
-        // HP Bar (top left)
-        const hpBarBg = this.add.rectangle(20, 20, 200, 20, 0x440000).setOrigin(0, 0);
-        this.hpBar = this.add.rectangle(20, 20, 200, 20, 0xff4444).setOrigin(0, 0);
-        this.hpText = this.add.text(120, 30, '100/100', {
-            font: '12px monospace',
+        // HP Bar (top left - with safe area padding)
+        const hpBarBg = this.add.rectangle(sidePad, topPad, 180, 18, 0x440000).setOrigin(0, 0);
+        this.hpBar = this.add.rectangle(sidePad, topPad, 180, 18, 0xff4444).setOrigin(0, 0);
+        this.hpText = this.add.text(sidePad + 90, topPad + 9, '100/100', {
+            font: '11px monospace',
             fill: '#ffffff'
         }).setOrigin(0.5);
         this.hudContainer.add([hpBarBg, this.hpBar, this.hpText]);
 
         // Level display (top left, below HP)
-        this.levelText = this.add.text(20, 50, 'Level: 1', {
-            font: '16px monospace',
+        this.levelText = this.add.text(sidePad, topPad + 24, 'Level: 1', {
+            font: '14px monospace',
             fill: '#00ff88'
         });
         this.hudContainer.add(this.levelText);
 
-        // XP Bar (bottom)
-        const xpBarBg = this.add.rectangle(CONSTANTS.GAME_WIDTH / 2, CONSTANTS.GAME_HEIGHT - 20, 
-            CONSTANTS.GAME_WIDTH - 40, 16, 0x003322).setOrigin(0.5);
-        this.xpBar = this.add.rectangle(20, CONSTANTS.GAME_HEIGHT - 28, 0, 16, 0x00ff88).setOrigin(0, 0);
+        // XP Bar (bottom - with safe area padding)
+        const xpBarBg = this.add.rectangle(CONSTANTS.GAME_WIDTH / 2, CONSTANTS.GAME_HEIGHT - bottomPad, 
+            CONSTANTS.GAME_WIDTH - (sidePad * 2) - 20, 14, 0x003322).setOrigin(0.5);
+        this.xpBar = this.add.rectangle(sidePad + 10, CONSTANTS.GAME_HEIGHT - bottomPad - 7, 0, 14, 0x00ff88).setOrigin(0, 0);
+        this.xpBarWidth = CONSTANTS.GAME_WIDTH - (sidePad * 2) - 20; // Store for updates
         this.hudContainer.add([xpBarBg, this.xpBar]);
 
-        // Kill count (top right)
-        this.killText = this.add.text(CONSTANTS.GAME_WIDTH - 20, 20, 'Kills: 0', {
-            font: '16px monospace',
+        // Kill count (top right - with safe area padding)
+        this.killText = this.add.text(CONSTANTS.GAME_WIDTH - sidePad, topPad, 'Kills: 0', {
+            font: '14px monospace',
             fill: '#ff6666'
         }).setOrigin(1, 0);
         this.hudContainer.add(this.killText);
 
         // Weapon display (top right, below kills)
-        this.weaponText = this.add.text(CONSTANTS.GAME_WIDTH - 20, 45, '', {
-            font: '12px monospace',
+        this.weaponText = this.add.text(CONSTANTS.GAME_WIDTH - sidePad, topPad + 20, '', {
+            font: '11px monospace',
             fill: '#9966ff'
         }).setOrigin(1, 0);
         this.hudContainer.add(this.weaponText);
+        
+        // Store padding values for other uses
+        this.hudPadding = { top: topPad, side: sidePad, bottom: bottomPad };
     }
 
     updateHUD() {
@@ -315,7 +328,7 @@ class GameScene extends Phaser.Scene {
         // Update XP bar
         const xpNeeded = this.player.getXPForNextLevel();
         const xpPercent = xpNeeded > 0 ? this.player.xp / xpNeeded : 1;
-        this.xpBar.width = (CONSTANTS.GAME_WIDTH - 40) * xpPercent;
+        this.xpBar.width = (this.xpBarWidth || (CONSTANTS.GAME_WIDTH - 40)) * xpPercent;
 
         // Update kills
         this.killText.setText(`Kills: ${this.statsManager.kills}`);
