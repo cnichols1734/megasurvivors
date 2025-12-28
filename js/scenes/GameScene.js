@@ -249,11 +249,12 @@ class GameScene extends Phaser.Scene {
         // Padding for safe areas on notched devices (iPhone X, 11, 12, 13, 14, 15, etc.)
         const isIPhone = /iPhone/i.test(navigator.userAgent);
         
-        // For 16:9 aspect ratio, we use percentage-based padding
-        // iPhone Dynamic Island in landscape takes about 6% of screen width on each side
-        const topPad = 12;
-        const sidePad = isIPhone ? Math.floor(CONSTANTS.GAME_WIDTH * 0.06) : 15; // ~58px on 960
-        const bottomPad = 18;
+        // For ultra-wide aspect ratio, we use percentage-based padding
+        // iPhone Dynamic Island in landscape takes about 5% of screen width on each side
+        // Extra top padding to avoid being cut off
+        const topPad = isIPhone ? 25 : 12;  // More top padding for iPhone
+        const sidePad = isIPhone ? Math.floor(CONSTANTS.GAME_WIDTH * 0.05) : 15; // ~63px on 1260
+        const bottomPad = isIPhone ? 22 : 18;
 
         // Timer display (top center)
         this.timerText = this.add.text(CONSTANTS.GAME_WIDTH / 2, topPad, '30:00', {
@@ -471,8 +472,8 @@ class GameScene extends Phaser.Scene {
         // Update wave manager
         this.waveManager.update(time, delta);
 
-        // Attract nearby XP gems to player
-        this.attractXPGems();
+        // Collect XP gems when player walks over them
+        this.collectNearbyXPGems();
 
         // Clean up off-screen projectiles
         this.cleanupProjectiles();
@@ -481,25 +482,29 @@ class GameScene extends Phaser.Scene {
         this.updateHUD();
     }
 
-    attractXPGems() {
+    collectNearbyXPGems() {
+        // XP gems stay on the ground - player must walk over them to collect
+        // No attraction/following behavior - just instant pickup within range
         const pickupRadius = CONSTANTS.PLAYER_PICKUP_RADIUS * (1 + this.player.pickupRangeBonus);
         
         this.xpGems.getChildren().forEach(gemSprite => {
+            // Make sure gem is stationary (no velocity)
+            if (gemSprite.body) {
+                gemSprite.body.setVelocity(0, 0);
+            }
+            
             const distance = Phaser.Math.Distance.Between(
                 this.player.sprite.x, this.player.sprite.y,
                 gemSprite.x, gemSprite.y
             );
             
-            if (distance < pickupRadius * 2 && distance > 10) {
-                const angle = Phaser.Math.Angle.Between(
-                    gemSprite.x, gemSprite.y,
-                    this.player.sprite.x, this.player.sprite.y
-                );
-                const speed = 200;
-                gemSprite.body.setVelocity(
-                    Math.cos(angle) * speed,
-                    Math.sin(angle) * speed
-                );
+            // Instant pickup if within range
+            if (distance < pickupRadius) {
+                const gem = gemSprite.getData('instance');
+                if (gem) {
+                    this.player.addXP(gem.value);
+                    gem.collect();
+                }
             }
         });
     }

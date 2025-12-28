@@ -11,7 +11,7 @@ const CONSTANTS = {
     PLAYER_BASE_SPEED: 150,
     PLAYER_BASE_HP: 100,
     PLAYER_HITBOX_RADIUS: 12,
-    PLAYER_PICKUP_RADIUS: 50,
+    PLAYER_PICKUP_RADIUS: 80,  // Decent range for instant XP pickup
     PLAYER_INVINCIBILITY_TIME: 1000, // ms after taking damage
     
     // XP and Leveling

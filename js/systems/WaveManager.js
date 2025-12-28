@@ -5,9 +5,9 @@ class WaveManager {
         this.spawnRate = CONSTANTS.ENEMY_SPAWN_RATE_BASE;
         this.enemyTypes = ['bat', 'zombie', 'skeleton'];
         this.spawnWeights = {
-            bat: 60,
-            zombie: 30,
-            skeleton: 10
+            bat: 80,
+            zombie: 15,
+            skeleton: 5
         };
     }
 
@@ -15,32 +15,63 @@ class WaveManager {
         const gameProgress = this.scene.gameTime / CONSTANTS.GAME_DURATION;
         const playerLevel = this.scene.player ? this.scene.player.level : 1;
         
-        // Spawn rate gets MUCH faster based on both time AND player level
-        // Base rate starts at 2000ms, gets down to 100ms at max difficulty
-        const timeMultiplier = Math.min(gameProgress * 2, 1); // Time factor (0 to 1)
-        const levelMultiplier = Math.min(playerLevel / 10, 1); // Level factor (0 to 1 at level 10+)
-        const difficultyFactor = Math.max(timeMultiplier, levelMultiplier); // Use whichever is higher
+        // Difficulty scaling - GRADUAL increase
+        // Level 1-4: Very chill, mostly time-based
+        // Level 5-10: Moderate increase
+        // Level 10+: Gets challenging
         
+        // Time factor (0 to 1 over 30 minutes)
+        const timeMultiplier = gameProgress;
+        
+        // Level factor - very gradual for early levels
+        // Level 1-4: almost no impact (0 to 0.1)
+        // Level 5-10: moderate (0.1 to 0.3)
+        // Level 10+: stronger (0.3+)
+        let levelMultiplier = 0;
+        if (playerLevel <= 4) {
+            levelMultiplier = (playerLevel - 1) * 0.03; // 0, 0.03, 0.06, 0.09
+        } else if (playerLevel <= 10) {
+            levelMultiplier = 0.09 + (playerLevel - 4) * 0.04; // 0.13 to 0.33
+        } else {
+            levelMultiplier = 0.33 + (playerLevel - 10) * 0.05; // 0.38+
+        }
+        
+        // Combined difficulty - time is primary factor, level is secondary
+        const difficultyFactor = Math.min((timeMultiplier * 0.7) + (levelMultiplier * 0.3), 1);
+        
+        // Spawn rate: 2000ms down to 300ms (not too crazy fast)
         this.spawnRate = Phaser.Math.Linear(
             CONSTANTS.ENEMY_SPAWN_RATE_BASE,
-            100, // Much faster minimum spawn rate
+            300,
             difficultyFactor
         );
 
-        // Update spawn weights based on time
+        // Update spawn weights based on time (not level)
         this.updateSpawnWeights(gameProgress);
 
         // Check if it's time to spawn
         if (time - this.lastSpawnTime >= this.spawnRate) {
             this.lastSpawnTime = time;
             
-            // Spawn count scales with BOTH time AND level
-            // At level 1: 1-2 enemies per spawn
-            // At level 5: 3-5 enemies per spawn  
-            // At level 10+: 5-10 enemies per spawn
-            const baseCount = 1 + Math.floor(gameProgress * 3);
-            const levelBonus = Math.floor(playerLevel / 2);
-            const spawnCount = Math.min(baseCount + levelBonus, 15); // Cap at 15 per spawn
+            // Spawn count - gradual increase
+            // Early game (level 1-4): 1-2 enemies per spawn
+            // Mid game (level 5-10): 2-4 enemies per spawn
+            // Late game (level 10+): 3-6 enemies per spawn
+            let spawnCount = 1;
+            
+            if (playerLevel <= 4) {
+                spawnCount = 1 + Math.floor(gameProgress * 2); // 1-2
+            } else if (playerLevel <= 10) {
+                spawnCount = 2 + Math.floor(gameProgress * 3); // 2-4
+            } else {
+                spawnCount = 3 + Math.floor(gameProgress * 4); // 3-6
+            }
+            
+            // Time also increases spawn count
+            spawnCount += Math.floor(gameProgress * 3);
+            
+            // Cap at reasonable amount
+            spawnCount = Math.min(spawnCount, 10);
             
             for (let i = 0; i < spawnCount; i++) {
                 if (this.scene.enemies.getChildren().length < CONSTANTS.MAX_ENEMIES) {
@@ -54,28 +85,27 @@ class WaveManager {
     }
 
     updateSpawnWeights(gameProgress) {
-        // Early game: mostly bats
-        // Mid game: mix of all
-        // Late game: more skeletons and zombies
+        // Enemy mix based on TIME only (not player level)
+        // This makes progression predictable
         
-        if (gameProgress < 0.1) {
-            // First 3 minutes - easy start
-            this.spawnWeights = { bat: 80, zombie: 15, skeleton: 5 };
-        } else if (gameProgress < 0.25) {
-            // 3-7.5 minutes
-            this.spawnWeights = { bat: 60, zombie: 30, skeleton: 10 };
-        } else if (gameProgress < 0.4) {
-            // 7.5-12 minutes
-            this.spawnWeights = { bat: 45, zombie: 35, skeleton: 20 };
-        } else if (gameProgress < 0.6) {
-            // 12-18 minutes
-            this.spawnWeights = { bat: 35, zombie: 35, skeleton: 30 };
-        } else if (gameProgress < 0.8) {
-            // 18-24 minutes
-            this.spawnWeights = { bat: 25, zombie: 40, skeleton: 35 };
+        if (gameProgress < 0.15) {
+            // First 4.5 minutes - very easy, mostly bats
+            this.spawnWeights = { bat: 90, zombie: 8, skeleton: 2 };
+        } else if (gameProgress < 0.3) {
+            // 4.5-9 minutes - introduce more zombies
+            this.spawnWeights = { bat: 70, zombie: 25, skeleton: 5 };
+        } else if (gameProgress < 0.5) {
+            // 9-15 minutes - balanced mix
+            this.spawnWeights = { bat: 55, zombie: 30, skeleton: 15 };
+        } else if (gameProgress < 0.7) {
+            // 15-21 minutes - more dangerous
+            this.spawnWeights = { bat: 40, zombie: 35, skeleton: 25 };
+        } else if (gameProgress < 0.85) {
+            // 21-25.5 minutes - getting tough
+            this.spawnWeights = { bat: 30, zombie: 35, skeleton: 35 };
         } else {
-            // 24-30 minutes - harder enemies dominate
-            this.spawnWeights = { bat: 15, zombie: 40, skeleton: 45 };
+            // 25.5-30 minutes - hardest mix before Death
+            this.spawnWeights = { bat: 20, zombie: 40, skeleton: 40 };
         }
     }
 
@@ -114,8 +144,14 @@ class WaveManager {
         // Get enemy type based on weights
         const enemyType = this.getRandomEnemyType();
 
-        // Scale enemy stats based on player level for extra challenge
-        const levelScaling = 1 + (player.level - 1) * 0.1; // 10% stronger per player level
+        // Very mild level scaling - only after level 5
+        // Level 1-4: no scaling
+        // Level 5+: 5% stronger per level above 4
+        const playerLevel = player.level;
+        let levelScaling = 1;
+        if (playerLevel > 4) {
+            levelScaling = 1 + (playerLevel - 4) * 0.05;
+        }
 
         // Create enemy with scaled stats
         const enemy = new Enemy(this.scene, x, y, enemyType);
