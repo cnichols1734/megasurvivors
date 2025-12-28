@@ -9,12 +9,36 @@ class WaveManager {
             zombie: 15,
             skeleton: 5
         };
+
+        // Hoard system
+        this.hoardActive = false;
+        this.hoardStartTime = 0;
+        this.hoardMessageShown = false;
+        this.hoardMessageStartTime = 0;
     }
 
     update(time, delta) {
         const gameProgress = this.scene.gameTime / CONSTANTS.GAME_DURATION;
         const playerLevel = this.scene.player ? this.scene.player.level : 1;
-        
+
+        // Check for hoard trigger after level 8
+        if (!this.hoardActive && !this.hoardMessageShown && playerLevel >= CONSTANTS.HOARD_TRIGGER_LEVEL) {
+            this.startHoardMessage(time);
+        }
+
+        // Handle hoard message display
+        if (this.hoardMessageShown && !this.hoardActive) {
+            if (time - this.hoardMessageStartTime >= CONSTANTS.HOARD_MESSAGE_DURATION) {
+                this.hideHoardMessage();
+                this.startHoard(time);
+            }
+        }
+
+        // Check if hoard should end
+        if (this.hoardActive && time - this.hoardStartTime >= CONSTANTS.HOARD_DURATION) {
+            this.endHoard();
+        }
+
         // Difficulty scaling - GRADUAL increase
         // Level 1-4: Very chill, mostly time-based
         // Level 5-10: Moderate increase
@@ -70,11 +94,17 @@ class WaveManager {
             // Time also increases spawn count
             spawnCount += Math.floor(gameProgress * 3);
             
-            // Cap at reasonable amount
-            spawnCount = Math.min(spawnCount, 10);
-            
+            // During hoard, multiply spawn count
+            if (this.hoardActive) {
+                spawnCount *= CONSTANTS.HOARD_SPAWN_MULTIPLIER;
+            }
+
+            // Cap at reasonable amount (higher during hoard)
+            const maxEnemies = this.hoardActive ? CONSTANTS.HOARD_MAX_ENEMIES : CONSTANTS.MAX_ENEMIES;
+            spawnCount = Math.min(spawnCount, 20); // Allow more per spawn during hoard
+
             for (let i = 0; i < spawnCount; i++) {
-                if (this.scene.enemies.getChildren().length < CONSTANTS.MAX_ENEMIES) {
+                if (this.scene.enemies.getChildren().length < maxEnemies) {
                     this.spawnEnemy();
                 }
             }
@@ -189,8 +219,50 @@ class WaveManager {
             const angle = (Math.PI * 2 / count) * i;
             const x = player.sprite.x + Math.cos(angle) * CONSTANTS.ENEMY_SPAWN_RADIUS_MIN;
             const y = player.sprite.y + Math.sin(angle) * CONSTANTS.ENEMY_SPAWN_RADIUS_MIN;
-            
+
             new Enemy(this.scene, x, y, type);
         }
+    }
+
+    // Hoard system methods
+    startHoardMessage(time) {
+        this.hoardMessageShown = true;
+        this.hoardMessageStartTime = time;
+
+        // Create hoard message overlay
+        if (!this.hoardMessage) {
+            this.hoardMessage = this.scene.add.text(
+                this.scene.cameras.main.centerX,
+                this.scene.cameras.main.centerY,
+                'HOARD INCOMING',
+                {
+                    fontSize: '64px',
+                    fontFamily: 'Arial Black',
+                    color: '#ff0000',
+                    stroke: '#000000',
+                    strokeThickness: 6
+                }
+            ).setOrigin(0.5).setScrollFactor(0).setDepth(1000);
+        } else {
+            this.hoardMessage.setVisible(true);
+        }
+    }
+
+    hideHoardMessage() {
+        if (this.hoardMessage) {
+            this.hoardMessage.setVisible(false);
+        }
+    }
+
+    startHoard(time) {
+        this.hoardActive = true;
+        this.hoardStartTime = time;
+        console.log('Hoard started!');
+    }
+
+    endHoard() {
+        this.hoardActive = false;
+        this.hoardMessageShown = false;
+        console.log('Hoard ended!');
     }
 }

@@ -29,6 +29,13 @@ const CONSTANTS = {
     ENEMY_SPAWN_RATE_BASE: 2000, // ms between spawns
     ENEMY_SPAWN_RATE_MIN: 200,   // fastest spawn rate
     MAX_ENEMIES: 300,
+
+    // Hoard Event Settings
+    HOARD_TRIGGER_LEVEL: 8,
+    HOARD_MESSAGE_DURATION: 2000, // 2 seconds
+    HOARD_DURATION: 30000, // 30 seconds
+    HOARD_SPAWN_MULTIPLIER: 5, // 5x more enemies during hoard
+    HOARD_MAX_ENEMIES: 500, // Allow more enemies during hoard
     
     // Enemy Types
     ENEMIES: {
