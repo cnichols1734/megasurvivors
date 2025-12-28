@@ -31,7 +31,8 @@ const CONSTANTS = {
     MAX_ENEMIES: 300,
 
     // Hoard Event Settings
-    HOARD_TRIGGER_LEVEL: 8,
+    HOARD_TRIGGER_LEVEL: 8, // First hoard at level 8
+    HOARD_LEVEL_INTERVAL: 6, // Hoard every 6 levels (8, 14, 20, 26, etc.)
     HOARD_MESSAGE_DURATION: 2000, // 2 seconds
     HOARD_DURATION: 30000, // 30 seconds
     HOARD_SPAWN_MULTIPLIER: 5, // 5x more enemies during hoard

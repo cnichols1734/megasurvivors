@@ -15,14 +15,26 @@ class WaveManager {
         this.hoardStartTime = 0;
         this.hoardMessageShown = false;
         this.hoardMessageStartTime = 0;
+        this.lastHoardLevel = 0; // Track which hoard levels have triggered
     }
 
     update(time, delta) {
         const gameProgress = this.scene.gameTime / CONSTANTS.GAME_DURATION;
         const playerLevel = this.scene.player ? this.scene.player.level : 1;
 
-        // Check for hoard trigger after level 8
-        if (!this.hoardActive && !this.hoardMessageShown && playerLevel >= CONSTANTS.HOARD_TRIGGER_LEVEL) {
+        // Check for hoard trigger every 6 levels starting at level 8 (8, 14, 20, 26, etc.)
+        const hoardInterval = CONSTANTS.HOARD_LEVEL_INTERVAL;
+        const firstHoardLevel = CONSTANTS.HOARD_TRIGGER_LEVEL;
+        
+        // Calculate which hoard number we should be at based on current level
+        // Level 8 = hoard 1, level 14 = hoard 2, level 20 = hoard 3, etc.
+        let expectedHoardCount = 0;
+        if (playerLevel >= firstHoardLevel) {
+            expectedHoardCount = Math.floor((playerLevel - firstHoardLevel) / hoardInterval) + 1;
+        }
+        
+        // Trigger hoard if we haven't triggered this one yet
+        if (!this.hoardActive && !this.hoardMessageShown && expectedHoardCount > this.lastHoardLevel) {
             this.startHoardMessage(time);
         }
 
@@ -234,13 +246,12 @@ class WaveManager {
             this.hoardMessage = this.scene.add.text(
                 this.scene.cameras.main.centerX,
                 this.scene.cameras.main.centerY,
-                'HOARD INCOMING',
+                'HOARD INCOMING!',
                 {
-                    fontSize: '64px',
-                    fontFamily: 'Arial Black',
-                    color: '#ff0000',
+                    font: 'bold 48px monospace',
+                    fill: '#ff0000',
                     stroke: '#000000',
-                    strokeThickness: 6
+                    strokeThickness: 4
                 }
             ).setOrigin(0.5).setScrollFactor(0).setDepth(1000);
         } else {
@@ -263,6 +274,7 @@ class WaveManager {
     endHoard() {
         this.hoardActive = false;
         this.hoardMessageShown = false;
+        this.lastHoardLevel++; // Increment so next hoard can trigger at next interval
         console.log('Hoard ended!');
     }
 }
