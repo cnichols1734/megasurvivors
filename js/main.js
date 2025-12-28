@@ -21,12 +21,15 @@ const config = {
     parent: 'game-container',
     pixelArt: true,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.ENVELOP,  // Fill entire screen, may crop edges slightly
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: CONSTANTS.GAME_WIDTH,
         height: CONSTANTS.GAME_HEIGHT,
-        // Expand to fill parent container
-        expandParent: true
+        expandParent: true,
+        min: {
+            width: 640,
+            height: 360
+        }
     },
     input: {
         activePointers: 2,

@@ -1,7 +1,7 @@
 // Game Constants - Easily tweakable for balancing
 const CONSTANTS = {
-    // Game Settings - 16:9 aspect ratio for mobile compatibility
-    GAME_WIDTH: 960,
+    // Game Settings - Ultra-wide 21:9 aspect ratio for modern phones
+    GAME_WIDTH: 1260,
     GAME_HEIGHT: 540,
     WORLD_WIDTH: 2400,
     WORLD_HEIGHT: 2400,
@@ -36,7 +36,7 @@ const CONSTANTS = {
             name: 'Bat',
             hp: 5,
             damage: 5,
-            speed: 120,
+            speed: 100,
             xp: 1,
             color: 0x8B4513
         },
