@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a0f;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+}
+
+#game-container {
+    position: relative;
+    border: 4px solid #2a1a4a;
+    border-radius: 8px;
+    box-shadow: 
+        0 0 20px rgba(138, 43, 226, 0.3),
+        0 0 40px rgba(138, 43, 226, 0.1),
+        inset 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+#game-container canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Loading screen fallback */
+#game-container:empty::before {
+    content: 'Loading...';
+    color: #8a2be2;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    max-width: 800px;
+    max-height: 600px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Scanline effect overlay */
+#game-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+    );
+    border-radius: 4px;
+}
+
+/* Portrait mode warning overlay */
+#rotate-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0a0f;
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #8a2be2;
+    text-align: center;
+    padding: 20px;
+}
+
+#rotate-warning .rotate-icon {
+    font-size: 80px;
+    margin-bottom: 30px;
+    animation: rotate-phone 2s ease-in-out infinite;
+}
+
+#rotate-warning h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+#rotate-warning p {
+    font-size: 14px;
+    color: #888;
+    max-width: 300px;
+}
+
+@keyframes rotate-phone {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-20deg); }
+    75% { transform: rotate(20deg); }
+}
+
+/* Mobile responsive - show rotate warning in portrait */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+    #rotate-warning {
+        display: flex !important;
+    }
+    
+    #game-container {
+        display: none !important;
+    }
+}
+
+/* Mobile landscape - fill screen */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    body {
+        width: 100vw;
+        height: 100vh;
+    }
+    
+    #game-container {
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    
+    #game-container canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    
+    #game-container::after {
+        display: none;
+    }
+}
+
+/* Desktop - maintain aspect ratio */
+@media screen and (min-width: 901px) {
+    #game-container {
+        max-width: 800px;
+        max-height: 600px;
+    }
+}
+
+/* Fullscreen mode */
+#game-container:fullscreen,
+#game-container:-webkit-full-screen {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Touch indicator (hidden by default, shown briefly on touch) */
+.touch-indicator {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid rgba(138, 43, 226, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.touch-indicator.active {
+    opacity: 0.6;
+}
+
+.touch-indicator-inner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(138, 43, 226, 0.4);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

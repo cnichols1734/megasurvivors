@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>MegaSurvivors</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%238a2be2'/><circle cx='50' cy='45' r='20' fill='%23ffd700'/></svg>">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Rotate device warning for portrait mode -->
+    <div id="rotate-warning">
+        <div class="rotate-icon">📱</div>
+        <h2>Rotate Your Device</h2>
+        <p>Please rotate your device to landscape mode to play MegaSurvivors</p>
+    </div>
+    
+    <div id="game-container"></div>
+    
+    <!-- Phaser 3 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <!-- Game Constants -->
+    <script src="js/utils/constants.js"></script>
+    
+    <!-- Systems -->
+    <script src="js/systems/StatsManager.js"></script>
+    <script src="js/systems/WaveManager.js"></script>
+    <script src="js/systems/UpgradeManager.js"></script>
+    
+    <!-- Entities -->
+    <script src="js/entities/XPGem.js"></script>
+    <script src="js/entities/Enemy.js"></script>
+    <script src="js/entities/Player.js"></script>
+    
+    <!-- Weapons -->
+    <script src="js/weapons/Weapon.js"></script>
+    <script src="js/weapons/MagicWand.js"></script>
+    <script src="js/weapons/Garlic.js"></script>
+    <script src="js/weapons/Knife.js"></script>
+    
+    <!-- Scenes -->
+    <script src="js/scenes/BootScene.js"></script>
+    <script src="js/scenes/MenuScene.js"></script>
+    <script src="js/scenes/GameScene.js"></script>
+    <script src="js/scenes/UpgradeScene.js"></script>
+    <script src="js/scenes/GameOverScene.js"></script>
+    
+    <!-- Main Game Entry -->
+    <script src="js/main.js"></script>
+</body>
+</html>
+
