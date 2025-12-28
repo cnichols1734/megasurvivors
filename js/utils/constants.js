@@ -15,11 +15,11 @@ const CONSTANTS = {
     PLAYER_INVINCIBILITY_TIME: 1000, // ms after taking damage
     
     // XP and Leveling
-    XP_TO_LEVEL: [10, 20, 35, 50, 70, 95, 125, 160, 200, 250, 310, 380, 460, 550, 650, 760, 880, 1010, 1150, 1300],
+    XP_TO_LEVEL: [15, 25, 40, 60, 80, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500],
     XP_GEM_VALUES: {
         small: 1,
-        medium: 5,
-        large: 20
+        medium: 2.5,
+        large: 10
     },
     
     // Enemy Settings
