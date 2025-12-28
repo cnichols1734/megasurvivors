@@ -34,14 +34,16 @@ class GameScene extends Phaser.Scene {
         this.upgradeManager = new UpgradeManager(this);
         this.soundManager = new SoundManager(this);
         
-        // Start background music on first interaction
+        // Resume audio context on first interaction (required for sound effects)
         this.input.once('pointerdown', () => {
-            this.soundManager.startMusic();
+            this.soundManager.resumeAudio();
         });
-        // Also start on keyboard
         this.input.keyboard.once('keydown', () => {
-            this.soundManager.startMusic();
+            this.soundManager.resumeAudio();
         });
+        
+        // Background music disabled for now (code kept for future use)
+        // this.soundManager.startMusic();
 
         // Create groups
         this.enemies = this.physics.add.group();
