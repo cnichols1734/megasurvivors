@@ -104,17 +104,22 @@ class Player {
         if (vx !== 0 || vy !== 0) {
             this.facing = { x: vx, y: vy };
             
-            // Flip sprite based on horizontal direction
+            // Change sprite texture based on direction
             if (vx < 0) {
-                this.sprite.setFlipX(true);
+                this.sprite.setTexture('player_left');
             } else if (vx > 0) {
-                this.sprite.setFlipX(false);
+                this.sprite.setTexture('player_right');
             }
         }
     }
 
     takeDamage(amount) {
         if (this.isInvincible) return;
+        
+        // Play hit sound
+        if (this.scene.soundManager) {
+            this.scene.soundManager.playSound('playerHit');
+        }
         
         // Apply damage reduction
         const actualDamage = amount * (1 - Math.min(this.damageReduction, 0.75));
@@ -188,6 +193,11 @@ class Player {
         this.xp -= this.getXPForNextLevel();
         this.level++;
         this.scene.statsManager.updateLevel(this.level);
+        
+        // Play level up sound
+        if (this.scene.soundManager) {
+            this.scene.soundManager.playSound('levelUp');
+        }
         
         // Visual effect
         this.scene.cameras.main.flash(200, 255, 255, 100);

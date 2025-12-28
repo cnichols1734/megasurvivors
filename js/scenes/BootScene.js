@@ -83,57 +83,146 @@ class BootScene extends Phaser.Scene {
     }
 
     createPlayerSprite() {
+        // Create right-facing mage sprite (detailed pixel art)
+        this.createMageSprite('player_right', false);
+        // Create left-facing mage sprite (mirrored)
+        this.createMageSprite('player_left', true);
+        // Default player texture (right-facing)
+        this.createMageSprite('player', false);
+    }
+    
+    createMageSprite(key, flipX) {
         const g = this.make.graphics({ x: 0, y: 0, add: false });
         const size = 32;
+        const cx = 16; // center x
+        
+        // Helper to draw mirrored
+        const px = (x) => flipX ? (size - 1 - x) : x;
         
         // Shadow
         g.fillStyle(0x000000, 0.3);
-        g.fillEllipse(16, 28, 16, 6);
+        g.fillEllipse(16, 30, 14, 4);
         
-        // Body (blue tunic)
-        g.fillStyle(0x4a7dc9, 1);
-        g.fillRect(11, 14, 10, 10);
+        // === ROBE (flowing wizard robe) ===
+        // Robe base - dark purple
+        g.fillStyle(0x2a1a4a, 1);
+        g.fillRect(10, 16, 12, 14);
+        // Robe flare at bottom
+        g.fillRect(8, 26, 16, 4);
+        g.fillRect(7, 28, 18, 2);
         
-        // Body highlight
-        g.fillStyle(0x6a9de9, 1);
-        g.fillRect(12, 15, 3, 8);
+        // Robe highlights - lighter purple
+        g.fillStyle(0x4a2a6a, 1);
+        g.fillRect(px(11), 17, 3, 11);
+        g.fillRect(px(15), 20, 2, 8);
         
-        // Legs
-        g.fillStyle(0x3d3d5c, 1);
-        g.fillRect(12, 24, 3, 5);
-        g.fillRect(17, 24, 3, 5);
+        // Robe trim - gold
+        g.fillStyle(0xffd700, 1);
+        g.fillRect(8, 28, 16, 1);
+        g.fillRect(14, 16, 4, 1);
         
-        // Boots
-        g.fillStyle(0x5c4033, 1);
-        g.fillRect(11, 27, 4, 3);
-        g.fillRect(17, 27, 4, 3);
+        // Robe front opening - dark
+        g.fillStyle(0x1a0a2e, 1);
+        g.fillRect(14, 17, 4, 11);
         
-        // Arms
-        g.fillStyle(0xf5d0c5, 1); // Skin tone
-        g.fillRect(8, 15, 3, 6);
-        g.fillRect(21, 15, 3, 6);
+        // Belt
+        g.fillStyle(0x8b4513, 1);
+        g.fillRect(10, 21, 12, 2);
+        g.fillStyle(0xffd700, 1);
+        g.fillRect(14, 21, 4, 2); // Belt buckle
         
-        // Head
+        // === ARMS with sleeves ===
+        // Left sleeve
+        g.fillStyle(0x2a1a4a, 1);
+        g.fillRect(px(6), 16, 4, 7);
+        g.fillStyle(0x4a2a6a, 1);
+        g.fillRect(px(7), 17, 2, 5);
+        // Hand
         g.fillStyle(0xf5d0c5, 1);
-        g.fillRect(12, 6, 8, 8);
+        g.fillRect(px(6), 22, 3, 3);
         
-        // Hair
+        // Right sleeve (holding staff)
+        g.fillStyle(0x2a1a4a, 1);
+        g.fillRect(px(22), 16, 4, 7);
+        g.fillStyle(0x4a2a6a, 1);
+        g.fillRect(px(23), 17, 2, 5);
+        // Hand
+        g.fillStyle(0xf5d0c5, 1);
+        g.fillRect(px(23), 21, 3, 3);
+        
+        // === STAFF ===
+        // Staff pole
         g.fillStyle(0x5c3317, 1);
-        g.fillRect(11, 4, 10, 4);
-        g.fillRect(11, 6, 2, 3);
-        g.fillRect(19, 6, 2, 3);
-        
-        // Eyes
-        g.fillStyle(0x000000, 1);
-        g.fillRect(13, 9, 2, 2);
-        g.fillRect(17, 9, 2, 2);
-        
-        // Eye highlight
+        g.fillRect(px(24), 8, 2, 20);
+        // Staff orb glow
+        g.fillStyle(0x00ffff, 0.4);
+        g.fillCircle(px(25), 6, 5);
+        // Staff orb
+        g.fillStyle(0x00ffff, 1);
+        g.fillCircle(px(25), 6, 3);
+        // Orb highlight
         g.fillStyle(0xffffff, 1);
-        g.fillRect(14, 9, 1, 1);
-        g.fillRect(18, 9, 1, 1);
+        g.fillRect(px(24), 4, 1, 1);
+        // Staff top decoration
+        g.fillStyle(0xffd700, 1);
+        g.fillRect(px(23), 9, 4, 2);
         
-        g.generateTexture('player', size, size);
+        // === HEAD ===
+        // Face
+        g.fillStyle(0xf5d0c5, 1);
+        g.fillRect(12, 8, 8, 7);
+        
+        // Beard (white/grey wizard beard)
+        g.fillStyle(0xe8e8e8, 1);
+        g.fillRect(12, 13, 8, 4);
+        g.fillRect(13, 17, 6, 2);
+        g.fillRect(14, 19, 4, 1);
+        // Beard detail
+        g.fillStyle(0xcccccc, 1);
+        g.fillRect(px(13), 14, 2, 3);
+        g.fillRect(px(17), 14, 2, 3);
+        
+        // === WIZARD HAT ===
+        // Hat brim
+        g.fillStyle(0x2a1a4a, 1);
+        g.fillRect(9, 7, 14, 2);
+        // Hat cone
+        g.fillRect(11, 5, 10, 2);
+        g.fillRect(12, 3, 8, 2);
+        g.fillRect(13, 1, 6, 2);
+        g.fillRect(14, 0, 4, 1);
+        // Hat highlight
+        g.fillStyle(0x4a2a6a, 1);
+        g.fillRect(px(12), 5, 2, 2);
+        g.fillRect(px(13), 3, 2, 2);
+        g.fillRect(px(14), 1, 2, 2);
+        // Hat band
+        g.fillStyle(0xffd700, 1);
+        g.fillRect(11, 5, 10, 1);
+        // Hat star
+        g.fillStyle(0xffff00, 1);
+        g.fillRect(15, 2, 2, 2);
+        
+        // === EYES ===
+        // Eyes (mysterious glowing)
+        g.fillStyle(0x00ffff, 1);
+        g.fillRect(px(13), 10, 2, 2);
+        g.fillRect(px(17), 10, 2, 2);
+        // Eye pupils
+        g.fillStyle(0x006666, 1);
+        g.fillRect(px(13), 11, 2, 1);
+        g.fillRect(px(17), 11, 2, 1);
+        // Eye glow
+        g.fillStyle(0xffffff, 0.8);
+        g.fillRect(px(13), 10, 1, 1);
+        g.fillRect(px(17), 10, 1, 1);
+        
+        // Eyebrows (bushy)
+        g.fillStyle(0xe8e8e8, 1);
+        g.fillRect(px(12), 9, 3, 1);
+        g.fillRect(px(17), 9, 3, 1);
+        
+        g.generateTexture(key, size, size);
         g.destroy();
     }
 

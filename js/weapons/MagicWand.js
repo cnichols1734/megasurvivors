@@ -40,6 +40,11 @@ class MagicWand extends Weapon {
         
         // Muzzle flash
         this.createMuzzleFlash();
+        
+        // Play shoot sound
+        if (this.scene.soundManager) {
+            this.scene.soundManager.playSound('shoot');
+        }
     }
 
     createFireball(x, y, angle) {

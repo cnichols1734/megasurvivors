@@ -32,6 +32,16 @@ class GameScene extends Phaser.Scene {
         this.statsManager = new StatsManager(this);
         this.waveManager = new WaveManager(this);
         this.upgradeManager = new UpgradeManager(this);
+        this.soundManager = new SoundManager(this);
+        
+        // Start background music on first interaction
+        this.input.once('pointerdown', () => {
+            this.soundManager.startMusic();
+        });
+        // Also start on keyboard
+        this.input.keyboard.once('keydown', () => {
+            this.soundManager.startMusic();
+        });
 
         // Create groups
         this.enemies = this.physics.add.group();
@@ -504,6 +514,10 @@ class GameScene extends Phaser.Scene {
                 if (gem) {
                     this.player.addXP(gem.value);
                     gem.collect();
+                    // Play pickup sound
+                    if (this.soundManager) {
+                        this.soundManager.playSound('xpPickup');
+                    }
                 }
             } else if (distance < pickupRadius || isAttracting) {
                 // Within pickup range - start flying towards player

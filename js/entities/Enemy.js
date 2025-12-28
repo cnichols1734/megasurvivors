@@ -156,6 +156,11 @@ class Enemy {
         if (this.isDead) return;
         this.isDead = true;
         
+        // Play death sound
+        if (this.scene.soundManager) {
+            this.scene.soundManager.playSound('enemyDeath');
+        }
+        
         // Track kill
         this.scene.statsManager.addKill(this.type);
         
